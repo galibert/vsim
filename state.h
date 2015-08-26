@@ -16,6 +16,9 @@ struct cstate {
   bool stbsr[3];
   bool input_phone_latch_stb, input_phone_latch_rom, pad_stb;
   unsigned char p_input, p_stb, p_rom;
+  unsigned char rom_param, rom_clvd, rom_duration;
+  bool rom_cl;
+  bool rom_muxed_fx_out;
 };
 
 #endif
