@@ -5,5 +5,6 @@
 
 void main_timings(cstate &s);
 void param_timings(cstate &s);
+void phone_input(cstate &s);
 
 #endif

@@ -19,11 +19,11 @@ void update(cstate &s)
   for(;;) {
     std::set<void (*)(cstate &)> f;
     compute_sched(ref, s, f);
+    ref = s;
     if(f.empty())
       break;
     for(std::set<void (*)(cstate &)>::const_iterator i = f.begin(); i != f.end(); i++)
       (*i)(s);
-    ref = s;
   }
 }
 
@@ -47,7 +47,30 @@ void show_state(const cstate &s)
   printf(" psr=");
   for(int i=0; i<17; i++)
     printf("%d", (i & 1) ? !s.paramsr[i] : s.paramsr[i]);
-  printf(" phi1=%d phi2=%d\n", s.phi1, s.phi2);
+  printf(" phi1=%d phi2=%d stbsr=%d%d%d pad_stb=%d ipl_s=%d ipl_r=%d p_stb=%02x p_rom=%02x\n",
+	 s.phi1, s.phi2,
+	 s.stbsr[0], s.stbsr[1], s.stbsr[2],
+	 s.pad_stb,
+	 s.input_phone_latch_stb, s.input_phone_latch_rom,
+	 s.p_stb, s.p_rom);
+}
+
+void step(cstate &s, bool verbose)
+{
+  s.clk_0 = false;
+  update(s);
+  if(verbose)
+    show_state(s);
+  s.ctime++;
+  s.clk_0 = true;
+  update(s);
+  s.clk_1 = false;
+  update(s);
+  if(verbose)
+    show_state(s);
+  s.ctime++;
+  s.clk_1 = true;
+  update(s);
 }
 
 int main()
@@ -55,20 +78,19 @@ int main()
   cstate s;
   init(s);
 
+  s.pad_stb = true;
+  s.p_stb = s.p_rom = s.p_input = 0x3f;
   s.clk_0 = s.clk_1 = true;
-  for(int i=0; i<1000; i++) {
-    s.clk_0 = false;
-    update(s);
-    show_state(s);
-    s.ctime++;
-    s.clk_0 = true;
-    update(s);
-    s.clk_1 = false;
-    update(s);
-    show_state(s);
-    s.ctime++;
-    s.clk_1 = true;
-    update(s);
-  }
+  for(int i=0; i<1000; i++)
+    step(s, false);
+
+  s.p_input = 0x20;
+  s.pad_stb = false;
+  for(int i=0; i<72; i++)
+    step(s, true);
+  s.pad_stb = true;
+  for(int i=0; i<1000; i++)
+    step(s, true);
+
   return 0;
 }

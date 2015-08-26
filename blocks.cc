@@ -43,9 +43,29 @@ void param_timings(cstate &s)
   if(!s.clk_0)
     s.paramsr[0] = !(s.rom_hsel_f2 && s.rom_hsel_f2q && s.rom_hsel_f3 && s.rom_extra && s.rom_hsel_fc && s.rom_hsel_fa && s.rom_hsel_va);
 
-  bool t = !(!s.phi1 && !s.paramsr[5] && !s.paramsr[13]);
-  s.phi1 = (t && s.rom_hsel_f2 && s.rom_hsel_fc);
+  bool t = s.phi1 || s.paramsr[5] || s.paramsr[13];
+  s.phi1 = t && s.rom_hsel_f2 && s.rom_hsel_fc;
 
-  t = !(!s.phi2 && !s.paramsr[1] && !s.paramsr[9]);
+  t = s.phi2 || s.paramsr[1] || s.paramsr[9];
   s.phi2 = (t && s.rom_hsel_f3 && s.rom_hsel_va);
+}
+
+void phone_input(cstate &s)
+{
+  if(!s.rom_extra)
+    s.stbsr[1] = !s.stbsr[0];
+
+  if(!s.phi1)
+    s.stbsr[2] = !s.stbsr[1];
+
+  s.input_phone_latch_stb = !s.pad_stb || !s.input_phone_latch_stb || s.stbsr[2];
+  s.input_phone_latch_rom = !(s.stbsr[1] && s.stbsr[2] && !s.rom_extra);
+
+  if(!s.phi1)
+    s.stbsr[0] = !s.input_phone_latch_stb;
+
+  if(!s.input_phone_latch_stb)
+    s.p_stb = s.p_input;
+  if(!s.input_phone_latch_rom)
+    s.p_rom = s.p_stb;
 }
