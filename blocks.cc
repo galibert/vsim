@@ -4,7 +4,11 @@ void main_timings(cstate &s)
 {
   s.gtsr_enable_input_1 = !(s.gtsr[1] || s.gtsr[3] || !s.gtsr[5]);
   s.gtsr_input = (s.gtsr[3]^s.gtsr[5]) || (s.gtsr[1] && s.gtsr[3]);
-    
+
+  // Hack to get the full cycle and not miss '111'
+  if(s.gtsr[1] && s.gtsr[3] && !s.gtsr[5])
+    s.gtsr_input = false;
+
   if(!s.clk_1) {
     s.gtsr[1] = !s.gtsr[0];
     s.gtsr[3] = !s.gtsr[2];
