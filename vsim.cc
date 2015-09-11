@@ -29,10 +29,10 @@ void update(cstate &s)
 
 void show_state(const cstate &s)
 {
-  printf("%02d.%06d.%d: gtsr=%d%d%d(%d) psre=%d ffc=%d",
+  printf("%02d.%06d.%d: gtsr=%d%d%d(%d) p80=%d",
 	 int(s.ctime/720000/2), int((s.ctime/2) % 720000), int(s.ctime & 1),
 	 s.gtsr[1], s.gtsr[3], s.gtsr[5], !s.gtsr_input,
-	 s.param_timing_sr_enable, s.final_filter_clock);
+	 s.pulse_80Hz);
   printf(" rom=");
   bool f=true;
   if(!s.rom_hsel_f2) { if(!f) printf(","); printf("f2 "); f=false; }
@@ -44,10 +44,7 @@ void show_state(const cstate &s)
   if(!s.rom_hsel_va) { if(!f) printf(","); printf("va "); f=false; }
   if(!s.rom_hsel_f1) { if(!f) printf(","); printf("f1 "); f=false; }
 
-  printf(" psr=");
-  for(int i=0; i<17; i++)
-    printf("%d", (i & 1) ? !s.paramsr[i] : s.paramsr[i]);
-  printf(" phi1=%d phi2=%d stbsr=%d%d%d pad_stb=%d ipl_s=%d ipl_r=%d p_stb=%02x p_rom=%02x rp=%x rclvd=%x rd=%02x rcl=%d, rmux=%d\n",
+  printf(" phi1=%d phi2=%d stbsr=%d%d%d pad_stb=%d ipl_s=%d ipl_r=%d p_stb=%02x p_rom=%02x rp=%x rclvd=%x rd=%02x rcl=%d rmux=%d",
 	 s.phi1, s.phi2,
 	 s.stbsr[0], s.stbsr[1], s.stbsr[2],
 	 s.pad_stb,
@@ -56,6 +53,9 @@ void show_state(const cstate &s)
 	 s.rom_param, s.rom_clvd, s.rom_duration, s.rom_cl,
 	 s.rom_muxed_fx_out
 	 );
+  printf(" sram=%02x.%02x.%02x.%02x.%02x.%02x.%02x di=%02x\n",
+	 s.sram[0], s.sram[1], s.sram[2], s.sram[3], s.sram[4], s.sram[5], s.sram[6],
+	 s.driver_in);
 }
 
 void step(cstate &s, bool verbose)

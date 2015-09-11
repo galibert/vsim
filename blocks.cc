@@ -2,7 +2,7 @@
 
 void main_timings(cstate &s)
 {
-  s.gtsr_enable_input_1 = !(s.gtsr[1] || s.gtsr[3] || !s.gtsr[5]);
+  s.gtsr_enable_input = !(s.gtsr[1] || s.gtsr[3] || !s.gtsr[5]);
   s.gtsr_input = (s.gtsr[3]^s.gtsr[5]) || (s.gtsr[1] && s.gtsr[3]);
 
   // Hack to get the full cycle and not miss '111'
@@ -13,15 +13,14 @@ void main_timings(cstate &s)
     s.gtsr[1] = !s.gtsr[0];
     s.gtsr[3] = !s.gtsr[2];
     s.gtsr[5] = !s.gtsr[4];
-    s.gtsr_enable_input_2 = !s.param_timing_sr_enable;
-    s.final_filter_clock = !s.gtsr_enable_input_2;
+    s.pulse_80Hz = s.param_timing_sr_enable;
   }
   if(!s.clk_0) {
-    if(!s.gtsr_enable_input_1 && !s.gtsr_enable_input_2 && !s.clk_0)
+    if(!s.gtsr_enable_input && s.pulse_80Hz && !s.clk_0)
       s.gtsr[0] = s.gtsr_input;
     s.gtsr[2] = !s.gtsr[1];
     s.gtsr[4] = !s.gtsr[3];
-    s.param_timing_sr_enable = !s.gtsr_enable_input_1;
+    s.param_timing_sr_enable = !s.gtsr_enable_input;
   }
 }
 

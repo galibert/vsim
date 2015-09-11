@@ -15,4 +15,6 @@ void compute_sched(const cstate &r, const cstate &s, std::set<void (*)(cstate &)
     f.insert(rom_read);
   if(T(gtsr[1]) || T(gtsr[3]) || T(gtsr[5]) || T(rom_param))
     f.insert(rom_param_muxer);
+  if(T(sram_w) || T(sram_enable_w) ||T(rom_hsel_f1) || T(rom_hsel_va) || T(rom_hsel_f2) || T(rom_hsel_fc) || T(rom_hsel_f2q) || T(rom_hsel_f3) || T(rom_hsel_fa) || T(gtsr[1]) || T(gtsr[3]) || T(gtsr[5]) || T(param_timing_sr_enable) || T(clk_1) || T(pulse_80Hz))
+    f.insert(sram_update);
 }

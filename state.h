@@ -6,8 +6,8 @@ struct cstate {
   bool clk_0, clk_1;
   bool gtsr[6];
   bool gtsr_input;
-  bool gtsr_enable_input_1;
-  bool gtsr_enable_input_2;
+  bool gtsr_enable_input;
+  bool pulse_80Hz;
   bool param_timing_sr_enable;
   bool final_filter_clock;
   bool paramsr[17];
@@ -19,6 +19,9 @@ struct cstate {
   unsigned char rom_param, rom_clvd, rom_duration;
   bool rom_cl;
   bool rom_muxed_fx_out;
+  bool sram_w, sram_enable_w, sram_enable_hold, sram_r, sram_alt_r;
+  unsigned char sram[7];
+  bool driver_in;
 };
 
 #endif

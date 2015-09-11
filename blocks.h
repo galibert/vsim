@@ -8,5 +8,7 @@ void param_timings(cstate &s);
 void phone_input(cstate &s);
 void rom_read(cstate &s);
 void rom_param_muxer(cstate &s);
+void sram_update(cstate &s);
+void interpolator(cstate &s);
 
 #endif

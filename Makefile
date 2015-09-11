@@ -3,8 +3,8 @@ ALLLIB =
 DEPLIB = 
 
 PROG = vsim
-OBJS = sched.o vsim.o rom.o blocks.o
-SRCS = sched.cc vsim.cc rom.cc blocks.cc
+OBJS = rom.o blocks.o sched.o sram.o vsim.o
+SRCS = rom.cc blocks.cc sched.cc sram.cc vsim.cc
 JUNK =
 
 OPT=-O9
@@ -40,7 +40,8 @@ distclean:
 	rm -f ${PROG} ${OBJS} ${JUNK}
 
 ###
-sched.o: sched.h state.h blocks.h
-vsim.o: blocks.h state.h sched.h
 rom.o: blocks.h state.h
 blocks.o: blocks.h state.h
+sched.o: sched.h state.h blocks.h
+sram.o: blocks.h state.h
+vsim.o: blocks.h state.h sched.h
