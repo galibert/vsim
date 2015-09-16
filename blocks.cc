@@ -61,7 +61,8 @@ void phone_input(cstate &s)
   if(!s.phi1)
     s.stbsr[2] = !s.stbsr[1];
 
-  s.input_phone_latch_stb = !s.pad_stb || !s.input_phone_latch_stb || s.stbsr[2];
+  bool t = !s.input_phone_latch_stb || !s.stbsr[2];
+  s.input_phone_latch_stb = !t || !s.pad_stb;
   s.input_phone_latch_rom = !(s.stbsr[1] && s.stbsr[2] && !s.rom_extra);
 
   if(!s.phi1)

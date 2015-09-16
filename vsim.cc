@@ -46,7 +46,7 @@ void show_state(const cstate &s)
 
   printf(" phi1=%d phi2=%d stbsr=%d%d%d pad_stb=%d ipl_s=%d ipl_r=%d p_stb=%02x p_rom=%02x rp=%x rclvd=%x rd=%02x rcl=%d rmux=%d",
 	 s.phi1, s.phi2,
-	 s.stbsr[0], s.stbsr[1], s.stbsr[2],
+	 s.stbsr[0], !s.stbsr[1], s.stbsr[2],
 	 s.pad_stb,
 	 s.input_phone_latch_stb, s.input_phone_latch_rom,
 	 s.p_stb, s.p_rom,
@@ -81,17 +81,19 @@ int main()
   cstate s;
   init(s);
 
-  s.pad_stb = true;
+  s.pad_stb = false;
   s.p_stb = s.p_rom = s.p_input = 0x3f;
   s.clk_0 = s.clk_1 = true;
   for(int i=0; i<1000; i++)
     step(s, false);
 
   s.p_input = 0x20;
-  s.pad_stb = false;
-  for(int i=0; i<72; i++)
-    step(s, true);
   s.pad_stb = true;
+  for(int i=0; i<72; i++)
+    step(s, false);
+  s.pad_stb = false;
+  for(int i=0; i<43; i++)
+    step(s, false);
   for(int i=0; i<1000; i++)
     step(s, true);
 
