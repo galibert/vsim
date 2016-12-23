@@ -2,6 +2,8 @@
 #define STATE_H
 
 struct cstate {
+  bool first;
+
   unsigned long long ctime;
   bool clk_0, clk_1;
   bool gtsr[6];
@@ -20,8 +22,19 @@ struct cstate {
   bool rom_cl;
   bool rom_muxed_fx_out;
   bool sram_w, sram_enable_w, sram_enable_hold, sram_r, sram_alt_r;
+  bool latch_sram_r, latch_sram_alt_r, carry1_in, carry1_out, carry2_in, carry2_out;
   unsigned char sram[7];
   bool driver_in;
+  bool right1[12];
+  bool right2[2];
+  bool right3[4];
+  bool tick_625hz, tick_208hz, tick_ph;
+  bool phone_end, clvd_detect;
+  bool phc[18], phc2[12];
+  bool cv_reached, cl_reached, cl_value;
+  bool pause, silent, clc_reset;
+  bool noise[30];
+  bool noise_out;
 };
 
 #endif

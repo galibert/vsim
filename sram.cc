@@ -1,4 +1,5 @@
 #include "blocks.h"
+#include <stdio.h>
 
 void sram_update(cstate &s)
 {
@@ -16,6 +17,8 @@ void sram_update(cstate &s)
   case 3: slot = 6; alt_slot = 3; break;
   case 7: slot = 7; alt_slot = 4; break;
   }
+  slot = (slot + 5) & 7;
+  alt_slot = (alt_slot + 5) & 7;
 
   int line = -1;
   if(!s.rom_hsel_f1 ) line = 0;
@@ -32,7 +35,7 @@ void sram_update(cstate &s)
   if(!s.pulse_80Hz)
     s.sram_enable_hold = !s.sram_enable_w;
 
-  if(line != -1 && !(s.clk_1 && s.pulse_80Hz && s.sram_enable_hold)) {
+  if(line != -1 && s.clk_1 && s.pulse_80Hz && s.sram_enable_hold) {
     if(s.sram_w)
       s.sram[line] = s.sram[line] | (1 << slot);
     else
@@ -48,4 +51,22 @@ void sram_update(cstate &s)
 
 void interpolator(cstate &s)
 {
+  if(!s.clk_1) {
+    s.latch_sram_r = s.sram_r;
+    s.latch_sram_alt_r = s.sram_alt_r;
+    s.carry1_out = s.carry1_in;
+    s.carry2_out = s.carry2_in;
+  }
+
+  bool p263 = !s.latch_sram_r^s.latch_sram_alt_r;
+  bool p217 = !p263^s.carry1_out;
+  bool p182 = !p217^s.rom_muxed_fx_out;
+  s.sram_w = p182^s.carry2_out;
+
+  if(!s.clk_0) {
+    s.carry1_in =
+      s.pulse_80Hz && ((p263 || s.carry1_out) && (s.latch_sram_r || s.latch_sram_alt_r));
+    s.carry2_in =
+      (!s.pulse_80Hz) || ((p182 || s.carry2_out) && (p217 || s.rom_muxed_fx_out));
+  }
 }

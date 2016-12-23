@@ -69,6 +69,7 @@ static const unsigned int rom[64][2] = {
 
 void rom_read(cstate &s)
 {
+  s.pause = !(s.p_rom == 0x03 || s.p_rom == 0x3e);
   int slot = -1;
   if(!s.rom_hsel_f1 ) slot = 0;
   if(!s.rom_hsel_va ) slot = 1;
@@ -89,19 +90,26 @@ void rom_read(cstate &s)
       ((base & 0x200000) ? 1 : 0);
   }
   if(slot != 0 && slot != 6)
-    s.rom_clvd = 0;
+    s.rom_clvd = 0xf;
   else {
     unsigned int base = (rom[s.p_rom][1] >> 28) | (rom[s.p_rom][0] << 4);
     if(slot == 6)
       base >>= 1;
     s.rom_clvd =
-      ((base & 0x01) ? 8 : 0) |
-      ((base & 0x04) ? 4 : 0) |
-      ((base & 0x10) ? 2 : 0) |
-      ((base & 0x40) ? 1 : 0);
+      ((base & 0x01) ? 1 : 0) |
+      ((base & 0x04) ? 2 : 0) |
+      ((base & 0x10) ? 4 : 0) |
+      ((base & 0x40) ? 8 : 0);
   }
   s.rom_cl = rom[s.p_rom][0] & 0x10;
-  s.rom_duration = rom[s.p_rom][0] >> 5;
+  s.rom_duration =
+    ((rom[s.p_rom][0] & 0x020) ? 0x40 : 0) |
+    ((rom[s.p_rom][0] & 0x040) ? 0x20 : 0) |
+    ((rom[s.p_rom][0] & 0x080) ? 0x10 : 0) |
+    ((rom[s.p_rom][0] & 0x100) ? 0x08 : 0) |
+    ((rom[s.p_rom][0] & 0x200) ? 0x04 : 0) |
+    ((rom[s.p_rom][0] & 0x400) ? 0x02 : 0) |
+    ((rom[s.p_rom][0] & 0x800) ? 0x01 : 0);
 }
 
 void rom_param_muxer(cstate &s)
@@ -116,14 +124,14 @@ void rom_param_muxer(cstate &s)
   // 110
 
   s.rom_muxed_fx_out = false;
-  if((s.gtsr[1] && s.gtsr[3] && s.gtsr[5]) ||
-     (!(s.rom_param & 1) && !s.gtsr[1] && s.gtsr[3] && s.gtsr[5]) ||
-     (!(s.rom_param & 2) && s.gtsr[1] && !s.gtsr[3] && s.gtsr[5]) ||
-     (!(s.rom_param & 4) && !s.gtsr[1] && s.gtsr[3] && !s.gtsr[5]) ||
-     (!(s.rom_param & 8) && !s.gtsr[1] && !s.gtsr[3] && s.gtsr[5]) ||
-     (!s.gtsr[1] && !s.gtsr[3] && !s.gtsr[5]) ||
-     (s.gtsr[1] && !s.gtsr[3] && !s.gtsr[5]) ||
-     (s.gtsr[1] && s.gtsr[3] && !s.gtsr[5]))
+  if((!s.gtsr[1] && !s.gtsr[3] && !s.gtsr[5]) ||
+     (!(s.rom_param & 1) && s.gtsr[1] && !s.gtsr[3] && !s.gtsr[5]) ||
+     (!(s.rom_param & 2) && !s.gtsr[1] && s.gtsr[3] && !s.gtsr[5]) ||
+     (!(s.rom_param & 4) && s.gtsr[1] && !s.gtsr[3] && s.gtsr[5]) ||
+     (!(s.rom_param & 8) && s.gtsr[1] && s.gtsr[3] && !s.gtsr[5]) ||
+     (s.gtsr[1] && s.gtsr[3] && s.gtsr[5]) ||
+     (!s.gtsr[1] && s.gtsr[3] && s.gtsr[5]) ||
+     (!s.gtsr[1] && !s.gtsr[3] && s.gtsr[5]))
     s.rom_muxed_fx_out = true;    
 }
 

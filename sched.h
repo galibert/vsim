@@ -2,9 +2,9 @@
 #define SCHED_H
 
 #include "state.h"
-#include <set>
+#include <list>
 
-void compute_sched(const cstate &r, const cstate &s, std::set<void (*)(cstate &)> &f);
+void compute_sched(const cstate &r, const cstate &s, std::list<void (*)(cstate &)> &f, bool first);
 
 #endif
 
